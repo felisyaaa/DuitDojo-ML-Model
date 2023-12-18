@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Flask==2.2.5
 Pillow==9.4.0
 transformers==4.35.2
@@ -5,3 +6,12 @@ donut-python==1.0.9
 datasets==2.15.0
 torch==2.1.0+cu121
 tqdm==4.66.1
+=======
+Flask==2.2.5
+Pillow==9.4.0
+transformers==4.35.2
+donut-python==1.0.9
+datasets==2.15.0
+torch==2.1.0+cu121
+tqdm==4.66.1
+>>>>>>> f636b010cf867eb06180c6d538e6646fd73f5c2a
