@@ -1,0 +1,7 @@
+Flask==2.2.5
+Pillow==9.4.0
+transformers==4.35.2
+donut-python==1.0.9
+datasets==2.15.0
+torch==2.1.0+cu121
+tqdm==4.66.1

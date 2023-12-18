@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donut Model Deployment</title>
+</head>
+<body>
+    <h1>Donut Model Deployment</h1>
+    <form action="/predict" method="post" enctype="multipart/form-data">
+        <label for="file">Upload an image:</label>
+        <input type="file" name="file" accept="image/*" required>
+        <br>
+        <button type="submit">Predict</button>
+    </form>
+</body>
+</html>
