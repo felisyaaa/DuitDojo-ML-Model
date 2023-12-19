@@ -16,10 +16,7 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads/'
 # Fetch model & processor
 processor = DonutProcessor.from_pretrained("Vasettha/Donut_Cord")
 model = VisionEncoderDecoderModel.from_pretrained("Vasettha/Donut_Cord")
-# processor = DonutProcessor.from_pretrained("https://huggingface.co/vasettha/Donut_Cord/tree/main")
-# model = VisionEncoderDecoderModel.from_pretrained("https://huggingface.co/vasettha/Donut_Cord/tree/main")
-# processor = DonutProcessor.from_pretrained('donut_model')
-# model = VisionEncoderDecoderModel.from_pretrained('donut_model')
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Assuming your model and processor are already defined
