@@ -1,0 +1,37 @@
+{
+  "menu": [
+    {
+      "nm": "Woman",
+      "cnt": "1",
+      "price": "0"
+    },
+    {
+      "nm": "Ham Cheese",
+      "cnt": "2",
+      "price": "74,000"
+    },
+    {
+      "nm": "Ice Java Tea",
+      "cnt": "1",
+      "price": "16,000"
+    },
+    {
+      "nm": "Mineral Water",
+      "cnt": "1",
+      "price": "13,000"
+    },
+    {
+      "nm": "Black & White",
+      "cnt": "1",
+      "price": "72,000"
+    }
+  ],
+  "sub_total": {
+    "subtotal_price": "175,000"
+  },
+  "total": {
+    "total_price": "175,000",
+    "cashprice": "200,000",
+    "changeprice": "25,000"
+  }
+}
