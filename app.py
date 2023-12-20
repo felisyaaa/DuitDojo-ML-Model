@@ -8,7 +8,7 @@ import torch
 from donut import JSONParseEvaluator
 import csv
 from werkzeug.utils import secure_filename
-import tensorflow 
+import tensorflow as tf
 from keras.models import load_model
 from keras.preprocessing.sequence import pad_sequences
 # from tensorflow.keras.models import load_model
@@ -68,26 +68,60 @@ def process_model1(image):
     seq = processor.token2json(seq)
     # ... perform inference with model 1 and get seq ...
 
+    if isinstance(seq['menu'], list):
+        menu_items = seq['menu']
+    else:
+        menu_items = [seq['menu']]
+
+    total_price = seq['total']['total_price']
+    data_dict = {
+        "raw_json": {
+            "menu": [],
+            "sub_total": {
+                "subtotal_price": total_price
+            },
+            "total": {
+                "cashprice": "",  
+                "changeprice": "",  
+                "total_price": total_price
+            }
+        },
+        "success": True  
+    }
+
+    for item in menu_items:
+        data_dict['raw_json']['menu'].append({
+            'cnt': item.get('cnt', ''),
+            'nm': item.get('nm', ''),
+            'price': item.get('price', '')
+        })
+
+
     # Save output of model 1 to JSON file
     json_file_path = 'menu_data.json'
     with open(os.path.join(app.config['UPLOAD_FOLDER_JSON'], json_file_path), 'w') as jsonfile:
-        json.dump(seq, jsonfile, indent=2)
-    return seq
+        json.dump(data_dict, jsonfile, indent=2)
+    return data_dict
 
 # Function to process Model 2
 def process_model2(json_data):
     # ... process json_data with Model 2 ...
-    items = []
+    menu_data = []
     
     raw_json = json_data.get('raw_json', {})
     menu = raw_json.get('menu', [])
 
     if isinstance(menu, dict):
-        items.append(menu.get('nm', ''))
+        menu_data.append(menu.get('nm', ''))
     elif isinstance(menu, list):
         for item in menu:
-            items.append(item.get('nm', ''))
-    return items
+            menu_data.append(item.get('nm', ''))
+    return menu_data
+
+def encode(texts):
+    text_sequences = tokenizer.texts_to_sequences(texts)
+    text_padded = pad_sequences(text_sequences, maxlen=max_length, padding=padding_type, truncating=trunc_type)
+    return text_padded
 
 @app.route("/")
 def index():
@@ -105,26 +139,38 @@ def donut_route():
 
             # Inference with Model 1
             image = Image.open(image_path).convert("RGB")
-            seq = process_model1(image)
+            data_dict = process_model1(image)
 
             # Process output of Model 1 with Model 2
             with open(os.path.join(app.config['UPLOAD_FOLDER_JSON'], 'menu_data.json')) as jsonfile:
                 json_data = json.load(jsonfile)
-            items = process_model2(json_data)
+            menu_data = process_model2(json_data)
 
+            padded_inputs = encode(menu_data)
+            padded_inputs_tensor = tf.convert_to_tensor(np.array(padded_inputs))
+            predictions = model2.predict(padded_inputs_tensor)
+            data = []
+            for i, text in enumerate(menu_data):
+                predicted_class = np.argmax(predictions[i])
+                predicted_label = label_encoder.classes_[predicted_class]
+                data.append([text, predicted_label])
             # Save output of Model 2 to final JSON file
             final_json_file_path = 'final_data.json'
             with open(os.path.join(app.config['UPLOAD_FOLDER_FINAL_JSON'], final_json_file_path), 'w') as final_jsonfile:
-                json.dump(items, final_jsonfile, indent=2)
+                json.dump(menu_data, final_jsonfile, indent=2)
 
             return jsonify({
                 "status": {
                     "code": 200,
                     "message": "Success predicting"
                 },
-                "data": {
-                    "final_data": items,
-                }
+                "menu": [
+                    {
+                        "nm": data[i][0],
+                        "category": data[i][1],
+                    }
+                    for i in range(len(data))
+                ]
             }), 200
         else:
             return jsonify({
